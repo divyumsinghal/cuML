@@ -25,7 +25,7 @@ class LinearRegression {
   LinearRegression& operator=(LinearRegression&& other) noexcept;
 
   void fit(std::vector<data_type> h_X, std::vector<data_type> h_y,
-           std::vector<data_type> h_coefficients, int m, int n);
+           std::vector<data_type>& h_coefficients, int m, int n);
 
  private:
   cublasHandle_t cublas_handle;
