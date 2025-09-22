@@ -119,5 +119,63 @@ void LinearRegression<data_type>::fit(std::vector<data_type> h_X,
   cudaFree(d_info);
 }
 
+// Alternative implementation using QR decomposition (more stable)
+template <>
+void LinearRegression<float>::fit(std::vector<float> h_X,
+                                  std::vector<float> h_y,
+                                  std::vector<float> &h_coefficients,
+                                  int num_samples, int num_features) {
+  float *d_X, *d_y, *d_tau, *d_work;
+  int *d_info;
+  int lwork;
+
+  // Allocate device memory
+  CUDA_CHECK(cudaMalloc(&d_X, num_samples * num_features * sizeof(float)));
+  CUDA_CHECK(cudaMalloc(&d_y, num_samples * sizeof(float)));
+  CUDA_CHECK(cudaMalloc(&d_tau, num_features * sizeof(float)));
+  CUDA_CHECK(cudaMalloc(&d_info, sizeof(int)));
+
+  // Copy data to device
+  CUDA_CHECK(cudaMemcpy(d_X, h_X.data(),
+                        num_samples * num_features * sizeof(float),
+                        cudaMemcpyHostToDevice));
+  CUDA_CHECK(cudaMemcpy(d_y, h_y.data(), num_samples * sizeof(float),
+                        cudaMemcpyHostToDevice));
+
+  // Query workspace size for QR decomposition
+  CUSOLVER_CHECK(cusolverDnSgeqrf_bufferSize(
+      cusolver_handle, num_samples, num_features, d_X, num_samples, &lwork));
+
+  CUDA_CHECK(cudaMalloc(&d_work, lwork * sizeof(float)));
+
+  // 1. QR decomposition of X
+  CUSOLVER_CHECK(cusolverDnSgeqrf(cusolver_handle, num_samples, num_features,
+                                  d_X, num_samples, d_tau, d_work, lwork,
+                                  d_info));
+
+  // 2. Solve using QR decomposition
+  CUSOLVER_CHECK(cusolverDnSormqr(cusolver_handle, CUBLAS_SIDE_LEFT,
+                                  CUBLAS_OP_T, num_samples, 1, num_features,
+                                  d_X, num_samples, d_tau, d_y, num_samples,
+                                  d_work, lwork, d_info));
+
+  // 3. Solve triangular system R * x = Q^T * y
+  const float alpha = 1.0f;
+  CUBLAS_CHECK(cublasStrsv(cublas_handle, CUBLAS_FILL_MODE_UPPER, CUBLAS_OP_N,
+                           CUBLAS_DIAG_NON_UNIT, num_features, d_X, num_samples,
+                           d_y, 1));
+
+  // Copy results back (only first num_features elements)
+  CUDA_CHECK(cudaMemcpy(h_coefficients.data(), d_y,
+                        num_features * sizeof(float), cudaMemcpyDeviceToHost));
+
+  // Cleanup
+  cudaFree(d_X);
+  cudaFree(d_y);
+  cudaFree(d_tau);
+  cudaFree(d_work);
+  cudaFree(d_info);
+}
+
 // Explicit template instantiation
 template class LinearRegression<float>;
