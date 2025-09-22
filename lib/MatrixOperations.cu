@@ -41,12 +41,26 @@ MatrixOperations<data_type>& MatrixOperations<data_type>::operator=(
 
 // Matrix multiplication wrapper: C = A * B
 // A: m x k, B: k x n, C: m x n
-template <typename data_type>
-void MatrixOperations<data_type>::matrixMultiplication(
-    const data_type* A, const data_type* B, data_type* C, int m, int n, int k,
-    data_type alpha, data_type beta) {
+// Generic template declaration (not defined)
+
+// Specialization for float
+template <>
+void MatrixOperations<float>::matrixMultiplication(const float* A,
+                                                   const float* B, float* C,
+                                                   int m, int n, int k,
+                                                   float alpha, float beta) {
   // cuBLAS uses column-major storage by default
   CUBLAS_CHECK(cublasSgemm(handle_, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
+                           A, m, B, k, &beta, C, m));
+}
+
+template <>
+void MatrixOperations<double>::matrixMultiplication(const double* A,
+                                                    const double* B, double* C,
+                                                    int m, int n, int k,
+                                                    double alpha, double beta) {
+  // cuBLAS uses column-major storage by default
+  CUBLAS_CHECK(cublasDgemm(handle_, CUBLAS_OP_N, CUBLAS_OP_N, m, n, k, &alpha,
                            A, m, B, k, &beta, C, m));
 }
 

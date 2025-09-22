@@ -11,6 +11,7 @@ set_target_properties(LinearRegression PROPERTIES
 target_link_libraries(LinearRegression
     utils
     CUDA::cublas
+    CUDA::cusolver
     CUDA::cuda_driver
 )
 

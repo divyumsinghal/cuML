@@ -1,5 +1,3 @@
-#pragma once
-
 #include <cublas_v2.h>
 #include <cuda_runtime.h>
 #include <cusolverDn.h>
@@ -113,4 +111,3 @@ void LinearRegression<data_type>::fit(std::vector<data_type> h_X,
 
 // Explicit template instantiation
 template class LinearRegression<float>;
-template class LinearRegression<double>;

@@ -20,6 +20,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 # Add subdirectories
 add_subdirectory(utils)
 add_subdirectory(lib)
+add_subdirectory(src)
 add_subdirectory(examples)
 
 # Optional: Add testing
