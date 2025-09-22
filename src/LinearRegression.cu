@@ -56,7 +56,8 @@ template <typename data_type>
 void LinearRegression<data_type>::fit(std::vector<data_type> h_X,
                                       std::vector<data_type> h_y,
                                       std::vector<data_type> h_coefficients,
-                                      int m, int n) {
+                                      int m,
+                                      int n) {  // m: samples, n: features
   data_type *d_X, *d_y, *d_XTX, *d_XTy, *d_work;
   int *d_info;
   int lwork;
