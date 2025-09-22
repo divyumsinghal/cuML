@@ -3,7 +3,7 @@
 #include <vector>
 
 int main() {
-  int m = 4, n = 4;
+  int m = 5, n = 3;
 
   /*
    *   A = |  1.0 |  5.0 |  9.0 | 13.0 |
@@ -14,10 +14,10 @@ int main() {
    *   B = |  1.0 |  2.0 |  3.0 |  4.0 |
    */
 
-  const std::vector<float> A = {1.0f,  2.0f,  3.0f,  4.0f,  5.0f,  6.0f,
-                                7.0f,  8.0f,  9.0f,  10.0f, 11.0f, 12.0f,
-                                13.0f, 14.0f, 15.0f, 16.0f};
-  const std::vector<float> B = {1.0f, 2.0f, 3.0f, 4.0f};
+  const std::vector<float> A = {1.0f,  2.0f,  3.0f,  4.0f,  5.0f,
+                                6.0f,  7.0f,  8.0f,  9.0f,  10.0f,
+                                11.0f, 12.0f, 13.0f, 14.0f, 15.0f};
+  const std::vector<float> B = {18.0f, 21.0f, 24.0f, 27.0f, 30.0f};
 
   /*
    *   C = | 276.0 | 304.0 | 332.0 |
